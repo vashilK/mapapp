@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Map Application</title>
+  <link rel="stylesheet" type="text/css" href="js/jquery.mobile-1.4.5.css">
+  <link rel="stylesheet" href="leaflet/leaflet.css" />
+  <script src="leaflet/leaflet.js"></script>
+  <script src="js/jquery.js"></script>
+  <script src="js/jquery.mobile-1.4.5.js"></script>
+  <script src="cordova.js"></script>
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
+  <script src='https://static-assets.mapbox.com/gl-pricing/dist/mapbox-gl.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' rel='stylesheet' />
+
+  <style>
+    html {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    #iamhere {
+      width: inherit;
+      height: 400px;
+    }
+
+    #search {
+      width: inherit;
+      height: 400px;
+    }
+
+    #aroundbox,
+    #aroundbox1,
+    #aroundbox2 {
+      width: inherit;
+      height: 400px;
+      display: none;
+    }
+
+    #searchbtn {
+      width: 80%;
+      height: 40px;
+      text-align: center;
+    }
+
+    /**Sticks the footer to the bottom of the page */
+    [data-role=page] {
+      height: 100% !important;
+      position: relative !important;
+    }
+
+    [data-role=footer] {
+      bottom: 0;
+      position: absolute !important;
+      top: auto !important;
+      width: 100%;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div data-role="page" id="pg1" style="height:100%">
+
+    <!-- header for the page -->
+    <div data-role="header">
+      <h2 id="simp">Map Application</h2>
+    </div>
+    <!-- Tabs -->
+    <div data-role="tabs">
+      <!-- This is the navbar -->
+      <div data-role="navbar">
+        <ul>
+          <li><a href="#mylocation" data-icon="location" class="ui-btn-active">My Location</a></li>
+          <li><a href="#searchloc" data-icon="search">Search Location</a></li>
+          <li><a href="#around" data-icon="info">What`s Around</a></li>
+        </ul>
+      </div>
+      <div data-role="main" class="ui-content">
+        <!-- My Location -->
+        <div id="mylocation">
+          <div id="iamhere">
+          </div>
+        </div>
+        <!-- Search Location -->
+        <div id="searchloc">
+          <div class="ui-grid-a">
+            <div class="ui-block-a"><input type="text" id="addrbox" name="address" placeholder="Port-Louis, Mauritius"></div>
+            <div class="ui-block-b"><button type="button" icon="search" id="searchbtn">search</button></div>
+          </div>
+          <div id="search"></div>
+        </div>
+        <!-- What`s Around -->
+        <div id="around">
+          <fieldset data-role="collapsible" data-expanded-icon="carat-u" data-collapsed-icon="carat-d" data-iconpos="right">
+            <legend>Type: </legend>
+            <div data-role="controlgroup" id="grouped">
+              <label>
+                <input name="radio" id="Restaurant" type="radio" value="restaurant"> Restaurant
+              </label>
+              <label>
+                <input name="radio" id="Police" type="radio" value="police"> Police Station
+              </label>
+              <label>
+                <input name="radio" id="Hospital" type="radio" value="hospital"> Hospital
+              </label>
+            </div>
+          </fieldset>
+          <br>
+          <div id="aroundbox"></div>
+          <div id="aroundbox1"></div>
+          <div id="aroundbox2"></div>
+        </div>
+      </div>
+    </div>
+    <!-- footer -->
+    <div data-role="footer">
+      <h5>Homework coded by ©Kissoon Neeschal BCNS17AFT170191</h5>
+    </div>
+  </div>
+  <!-- Logic for the MAP -->
+  <script>
+    var lat;
+    var longitude;
+    //This is for main page current location
+    if (navigator.geolocation == undefined) {
+      alert("Gelocation undefined");
+    } else {
+      //alert("Geolocation Available");
+      navigator.geolocation.getCurrentPosition(userLocated, LocationError);
+
+      function userLocated(position) {
+        lat = position.coords.latitude;
+        longitude = position.coords.longitude;
+        var mymap = L.map('iamhere').setView([lat, longitude], 17);
+        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+          maxZoom: 19,
+          attribution: 'Map data &copy;' +
+            '<a href="https://www.openstreetmap.org/">OpenStreetMap</a>' +
+            'contributors,<a href="https://creativecommons.org/licenses' +
+            '/by-sa/2.0/">CC-BY-SA</a>,Imagery © <a href="https://' +
+            'www.mapbox.com/">Mapbox</a>',
+          id: 'mapbox.satellite',
+          accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYyc' +
+            'XBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+        }).addTo(mymap);
+
+        var marker = L.marker([lat, longitude]).addTo(mymap);
+        marker.bindPopup("<b>This is you!<b>").openPopup();
+
+        var circle = L.circle([lat, longitude], {
+          color: 'green',
+          fillColor: '#f03',
+          fillOpacity: 0.3,
+          radius: 90
+        }).addTo(mymap);
+
+        circle.bindPopup("You may find the treasure around here");
+        //alert("Lat:"+ lat + ", Long"+longitude);
+      }
+
+      function LocationError(error) {
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            alert("Permission Denied-" + error.message);
+            break;
+
+          case error.POSITION_UNAVAILABLE:
+            alert("Request Time out-" + error.message);
+
+        }
+      }
+    }
+    //SEARCH LOCATION BY NAME
+    var addr;
+    $("#searchbtn").click(function() {
+      addr = $("#addrbox").val();
+      //Turning typed address into a search criteria
+      while ((addr.indexOf(' ') && addr.indexOf(',')) >= 0) {
+        if (addr.indexOf(' ') >= 0) {
+          addr = addr.replace(" ", "%");
+        } else if (addr.indexOf(',') >= 0) {
+          addr = addr.replace(",", "/");
+        }
+      }
+      //To ensure country is Mauritius
+      if ((addr.includes("Mauritius") == false) || (addr.includes("mauritius") == false)) {
+        addr = addr + "/Mauritius";
+      }
+      //NOMINATIM API FOR SEARCH
+      var searchlat;
+      var searchlong;
+      var geoloc = "https://nominatim.openstreetmap.org/search/" + addr + "?format=json";
+      $.getJSON(geoloc, function(data) {
+        console.log(data);
+        //retrieving returned values from the API
+        searchlat = data[0].lat;
+        searchlong = data[0].lon;
+        //Display map for search option
+        var mymap2 = L.map('search').setView([searchlat, searchlong], 15);
+        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+          maxZoom: 19,
+          attribution: 'Map data &copy;' +
+            '<a href="https://www.openstreetmap.org/">OpenStreetMap</a>' +
+            'contributors,<a href="https://creativecommons.org/licenses' +
+            '/by-sa/2.0/">CC-BY-SA</a>,Imagery © <a href="https://' +
+            'www.mapbox.com/">Mapbox</a>',
+          id: 'mapbox.streets-satellite',
+          accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYyc' +
+            'XBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+        }).addTo(mymap2);
+        var marker = L.marker([searchlat, searchlong]).addTo(mymap2);
+      });
+      $("#search").hide("slow").show("slow");
+    });
+    //NEARBY BUILDING
+    var selection;
+    //This is for main page current location
+    $("#grouped").change(function() {
+      selection = $("input[name='radio']:checked").val();
+      var api = "https://places.cit.api.here.com/places/v1/autosuggest?at=" + lat + "," + longitude + "&q=" + selection + "&app_id=6HK4rI7nJG7U70E3sSlb&app_code=ojkRjUzTEJR5VLyGobiRIQ";
+      $.getJSON(api, function(data) {
+        console.log(data);
+        var i;
+        var a = [];
+        var b = [];
+        var c = [];
+        for (i = 0; i < data.results.length; i++) {
+          //Ensuring that values returned by API are not void
+          if (data.results[i].position != null) {
+            a[i] = data.results[i].position[0];
+            b[i] = data.results[i].position[1];
+            c[i] = data.results[i].title;
+          }
+
+        }
+        //Display MAP
+        switch (selection) {
+          case "restaurant":
+            $("#aroundbox1").hide();
+            $("#aroundbox2").hide();
+            $("#aroundbox").show();
+            var mymap = L.map('aroundbox').setView([lat, longitude], 13);
+            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+              maxZoom: 19,
+              attribution: 'Map data &copy;' +
+                '<a href="https://www.openstreetmap.org/">OpenStreetMap</a>' +
+                'contributors,<a href="https://creativecommons.org/licenses' +
+                '/by-sa/2.0/">CC-BY-SA</a>,Imagery © <a href="https://' +
+                'www.mapbox.com/">Mapbox</a>',
+              id: 'mapbox.satellite',
+              accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYyc' +
+                'XBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+            }).addTo(mymap);
+            //Populating markers on the MAP
+            var marker = [];
+            var one;
+            for (one = 0; one < data.results.length; one++) {
+              if (a[one] != null) {
+                //Limits Results to Mauritius Only
+                if ((parseFloat(a[one]) <= -19) && (parseFloat(a[one]) >= -21)) {
+                  if ((parseFloat(b[one]) >= 50.298947582) && (parseFloat(b[one]) <= 60.8262634203)) {
+                    marker[one] = L.marker([a[one], b[one]]).addTo(mymap);
+                    marker[one].bindPopup(c[one]).openPopup();
+                  }
+                }
+              }
+            }
+            break;
+          case "police":
+            $("#aroundbox").hide();
+            $("#aroundbox2").hide();
+            $("#aroundbox1").show();
+            var mymap2 = L.map('aroundbox1').setView([lat, longitude], 13);
+            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+              maxZoom: 19,
+              attribution: 'Map data &copy;' +
+                '<a href="https://www.openstreetmap.org/">OpenStreetMap</a>' +
+                'contributors,<a href="https://creativecommons.org/licenses' +
+                '/by-sa/2.0/">CC-BY-SA</a>,Imagery © <a href="https://' +
+                'www.mapbox.com/">Mapbox</a>',
+              id: 'mapbox.satellite',
+              accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYyc' +
+                'XBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+            }).addTo(mymap2);
+            //Populating markers on the MAP
+            var marker = [];
+            var one;
+            for (one = 0; one < data.results.length; one++) {
+              if (a[one] != null) {
+                //Limits Results to Mauritius Only
+                if ((parseFloat(a[one]) <= -19) && (parseFloat(a[one]) >= -21)) {
+                  if ((parseFloat(b[one]) >= 50.298947582) && (parseFloat(b[one]) <= 60.8262634203)) {
+                    marker[one] = L.marker([a[one], b[one]]).addTo(mymap2);
+                    marker[one].bindPopup(c[one]).openPopup();
+                  }
+                }
+              }
+            }
+            break;
+          case "hospital":
+            $("#aroundbox1").hide();
+            $("#aroundbox").hide();
+            $("#aroundbox2").show();
+            var mymap3 = L.map('aroundbox2').setView([lat, longitude], 13);
+            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+              maxZoom: 19,
+              attribution: 'Map data &copy;' +
+                '<a href="https://www.openstreetmap.org/">OpenStreetMap</a>' +
+                'contributors,<a href="https://creativecommons.org/licenses' +
+                '/by-sa/2.0/">CC-BY-SA</a>,Imagery © <a href="https://' +
+                'www.mapbox.com/">Mapbox</a>',
+              id: 'mapbox.satellite',
+              accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYyc' +
+                'XBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+            }).addTo(mymap3);
+            //Populating markers on the MAP
+            var marker = [];
+            var one;
+            for (one = 0; one < data.results.length; one++) {
+              if (a[one] != null) {
+                //Limits Results to Mauritius Only
+                if ((parseFloat(a[one]) <= -19) && (parseFloat(a[one]) >= -21)) {
+                  if ((parseFloat(b[one]) >= 50.298947582) && (parseFloat(b[one]) <= 60.8262634203)) {
+                    marker[one] = L.marker([a[one], b[one]]).addTo(mymap3);
+                    marker[one].bindPopup(c[one]).openPopup();
+                  }
+                }
+              }
+            }
+            break;
+          default:
+            break;
+
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
