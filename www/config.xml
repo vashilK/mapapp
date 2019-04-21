@@ -1,14 +1,49 @@
-<?xml version='1.0' encoding='utf-8'?>
-<widget id="com.phonegap.helloworld" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
-    <name>MapClasswork</name>
+<?xml version="1.0" encoding="UTF-8" ?>
+    <widget xmlns="http://www.w3.org/ns/widgets"
+        xmlns:cdv="http://cordova.apache.org/ns/1.0"
+        id          = "com.vnk.PG"
+        versionCode = "1"
+        version     = "1.1.0" >
+
+    <!-- versionCode is Android only -->
+    <!-- version is in major.minor.patch format -->
+    <name>TechX</name>
+
     <description>
-        A blank PhoneGap app.
+        An example for phonegap build app which wont show up in the playstore.
     </description>
-    <author email="support@phonegap.com" href="http://phonegap.com">
-        PhoneGap Team
+
+    <author email="kissoonvashil@gmail.com">
+        Kissoon Neeschal
     </author>
-    <preference name="orientation" value="portrait" />
-    <plugin name="cordova plugin add cordova-plugin-geolocation" source="npm" />
-    <content src="index.html" />
+
     <access origin="*" />
+
+    <platform name="android"/>
+
+    <preference name = "android-minSdkVersion" value="21" />
+    <preference name = "android-maxSdkVersion" value="26" />
+    <preference name = "android-targetSdkVersion" value="22" />
+
+
+    <preference name="orientation" value="portrait" />
+    <preference name="fullscreen" value="true" />
+    <preference name="KeepRunning" value="false" />
+    <preference name="SplashScreen" value="screen"/>
+    <preference name="android-build-tool" value="gradle" />
+
+
+    <plugin name="cordova-plugin-geolocation" source="npm" />
+    <plugin name="cordova-plugin-webintent2" source="npm"/>
+    <plugin name="cordova-plugin-admobpro" source="npm"/>
+    <plugin name="cordova-plugin-network-information" source="npm"/>
+    <plugin name="cordova-plugin-x-toast" source="npm"/>
+    <plugin name="checkinternet" source="npm"/>
+    <plugin name="cordova-plugin-inappbrowser-wkwebview" source="npm"/>
+    <plugin name="cordova-cookie-sharing" source="npm"/>
+    <plugin name="cordova-plugin-file-chooser" source="npm"/>
+    <plugin name="cordova-plugin-whitelist" source="npm"/>
+    <plugin name="cordova-plugin-splashscreen" source="npm" />
+
+
 </widget>
