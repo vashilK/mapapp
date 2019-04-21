@@ -8,7 +8,6 @@
         PhoneGap Team
     </author>
     <preference name="orientation" value="portrait" />
-    <plugin name="cordova plugin rm org.apache.cordova.geolocation" source="npm" />
     <plugin name="cordova plugin add cordova-plugin-geolocation" source="npm" />
     <content src="index.html" />
     <access origin="*" />
